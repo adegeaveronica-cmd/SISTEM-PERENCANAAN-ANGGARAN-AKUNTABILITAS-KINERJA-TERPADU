@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPERKA DISDIKBUD PESISIR BARAT - Perencanaan, Keuangan & e-SAKIP</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0a3751',
+                        },
+                        pesisir: {
+                            gold: '#d97706',
+                            emerald: '#059669',
+                            dark: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .doc-preview-font { font-family: 'Merriweather', 'Georgia', serif; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .print-shadow-none { box-shadow: none !important; border: none !important; }
+            body { background: white !important; overflow: visible !important; }
+            .doc-print-area { padding: 0 !important; margin: 0 !important; border: none !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden text-slate-800 bg-slate-100">
+
+    <!-- Global Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 z-30 shadow-xl flex-shrink-0">
+            <!-- Brand Header -->
+            <div class="p-4 border-b border-slate-800 flex items-center gap-3 bg-slate-950">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-sky-600 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md border border-amber-400/30 flex-shrink-0">
+                    <i class="fa-solid fa-landmark"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <h1 class="font-extrabold text-white text-sm tracking-wide leading-tight truncate">SIPERKA</h1>
+                    <p class="text-[10px] text-amber-400 font-semibold tracking-wider uppercase truncate">Disdikbud Pesisir Barat</p>
+                </div>
+            </div>
+
+            <!-- Identity Badge -->
+            <div class="px-4 py-2.5 bg-slate-800/60 border-b border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                <span class="flex items-center gap-1.5 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> T.A. 2026 (APBD Murni)
+                </span>
+                <span class="bg-sky-950 text-sky-400 border border-sky-800 text-[10px] px-1.5 py-0.5 rounded font-mono">KRUI</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar">
+                <div class="text-[10px] uppercase font-bold text-slate-500 px-3 pt-2 pb-1 tracking-wider">Utama</div>
+                
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-white bg-sky-600 shadow-md">
+                    <i class="fa-solid fa-chart-pie w-4 text-center"></i>
+                    <span>Dashboard Utama</span>
+                </button>
+
+                <div class="text-[10px] uppercase font-bold text-slate-500 px-3 pt-3 pb-1 tracking-wider">Modul Kerja Anggaran</div>
+
+                <button onclick="switchTab('perencanaan')" id="nav-perencanaan" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-file-pen w-4 text-center text-sky-400"></i>
+                    <span>Perencanaan & RKA</span>
+                </button>
+
+                <button onclick="switchTab('dpadppa')" id="nav-dpadppa" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-folder-open w-4 text-center text-indigo-400"></i>
+                    <span>DPA & DPPA Anggaran</span>
+                </button>
+
+                <button onclick="switchTab('keuangan')" id="nav-keuangan" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-money-bill-wave w-4 text-center text-emerald-400"></i>
+                    <span>Keuangan & SP2D</span>
+                </button>
+
+                <button onclick="switchTab('bos')" id="nav-bos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-graduation-cap w-4 text-center text-amber-400"></i>
+                    <span>Dana BOS & BOP PAUD</span>
+                </button>
+
+                <button onclick="switchTab('kebudayaan')" id="nav-kebudayaan" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-masks-theater w-4 text-center text-purple-400"></i>
+                    <span>Program Kebudayaan</span>
+                </button>
+
+                <div class="text-[10px] uppercase font-bold text-slate-500 px-3 pt-3 pb-1 tracking-wider">Akuntabilitas & SAKIP</div>
+
+                <button onclick="switchTab('esakip')" id="nav-esakip" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-award w-4 text-center text-teal-400"></i>
+                    <span>e-SAKIP & Capaian IKU</span>
+                </button>
+
+                <div class="text-[10px] uppercase font-bold text-slate-500 px-3 pt-3 pb-1 tracking-wider">Penyusun Dokumen Resmi</div>
+
+                <button onclick="switchTab('docbuilder')" id="nav-docbuilder" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-rose-400"></i>
+                    <span>Pembuat RENSTRA, RENJA & LKJIP</span>
+                </button>
+
+                <button onclick="switchTab('verifikasi')" id="nav-verifikasi" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200 justify-between">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-check-double w-4 text-center text-pink-400"></i>
+                        <span>Verifikasi & Approval</span>
+                    </div>
+                    <span id="pending-count-badge" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+                </button>
+
+                <button onclick="switchTab('laporan')" id="nav-laporan" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-print w-4 text-center text-cyan-400"></i>
+                    <span>Laporan LRA & LKPJ</span>
+                </button>
+            </nav>
+
+            <!-- User Footer Info -->
+            <div class="p-3 bg-slate-950 border-t border-slate-800/80 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white text-xs border border-slate-600">
+                    KD
+                </div>
+                <div class="overflow-hidden flex-1">
+                    <p class="text-xs font-bold text-white truncate">MARNENTINUS, S.IP.</p>
+                    <p class="text-[10px] text-slate-400 truncate">Kepala Dinas / Admin Utama</p>
+                </div>
+                <button title="Ganti Sesi" onclick="showToast('Sesi Aktif: MARNENTINUS, S.IP.', 'info')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-user-check text-xs"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
+
+            <!-- TOP BAR -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-20 no-print">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-toggle" onclick="toggleSidebar()" class="text-slate-600 hover:text-slate-900 p-2 rounded-lg hover:bg-slate-100 transition-colors">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div>
+                        <h2 id="page-title" class="text-base font-bold text-slate-800">Dashboard Eksekutif Perencanaan & Keuangan</h2>
+                        <p id="page-subtitle" class="text-xs text-slate-500">Dinas Pendidikan dan Kebudayaan Kabupaten Pesisir Barat</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-100 rounded-lg p-1 text-xs border border-slate-200">
+                        <span class="text-slate-500 font-medium px-2">Tahun:</span>
+                        <select id="select-ta" onchange="changeTA(this.value)" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            <option value="2026" selected>2026 (Murni)</option>
+                            <option value="2025">2025 (Kinerja)</option>
+                            <option value="2024">2024 (Arsip)</option>
+                        </select>
+                    </div>
+
+                    <!-- Quick Search -->
+                    <div class="relative hidden md:block">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" placeholder="Cari RKA, DPA, IKU, Dokumen..." class="pl-8 pr-3 py-1.5 text-xs bg-slate-100 border border-slate-200 rounded-lg w-48 focus:w-64 transition-all focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500">
+                    </div>
+
+                    <!-- Notification Button -->
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="relative p-2 text-slate-600 hover:text-sky-600 hover:bg-slate-100 rounded-lg transition-colors">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                        </button>
+                        <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-200 shadow-xl rounded-xl p-3 z-50 text-xs space-y-2">
+                            <div class="flex items-center justify-between font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                <span>Notifikasi Sistem</span>
+                                <span class="bg-sky-100 text-sky-700 text-[10px] px-2 py-0.5 rounded-full">3 Baru</span>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <a href="#" class="block p-2 rounded-lg bg-sky-50/60 hover:bg-sky-100/60 transition-colors">
+                                    <p class="font-semibold text-slate-800">DPA DPPA Perubahan Dikdas Disetujui</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Pergeseran Anggaran Sub-Kegiatan • 10 mnt lalu</p>
+                                </a>
+                                <a href="#" class="block p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <p class="font-semibold text-slate-800">Capaian LKJIP Triwulan III Selesai</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Capaian IKU Pendidikan 89.4% • 1 jam lalu</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="window.print()" class="hidden sm:flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm transition-all">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
+
+                <!-- ================= TAB 1: DASHBOARD ================= -->
+                <div id="tab-dashboard" class="tab-content space-y-6">
+                    
+                    <!-- Top Announcement Banner -->
+                    <div class="bg-gradient-to-r from-sky-900 via-sky-800 to-indigo-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <div class="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs px-2.5 py-1 rounded-full font-medium mb-2">
+                                    <i class="fa-solid fa-award text-xs"></i> Modul Terintegrasi: Renstra, Renja, DPA, LKJIP & e-SAKIP
+                                </div>
+                                <h3 class="text-xl font-extrabold tracking-tight">SIPERKA DISDIKBUD PESISIR BARAT 2026</h3>
+                                <p class="text-sky-100 text-xs mt-1 max-w-2xl leading-relaxed">
+                                    Pusat Manajemen Perencanaan, Penganggaran, Realisasi SP2D, Evaluasi Kinerja e-SAKIP, dan Generator Dokumen Resmi Dinas Pendidikan dan Kebudayaan.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button onclick="switchTab('docbuilder')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Buat Dokumen (Renstra/LKJIP)
+                                </button>
+                                <button onclick="switchTab('esakip')" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl border border-white/20 backdrop-blur-sm transition-all">
+                                    Nilai e-SAKIP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Executive Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pagu APBD Total</span>
+                                <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-wallet text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-xl font-black text-slate-800">Rp 124,8 M</p>
+                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                                    <span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-up"></i> DPA Valid</span> T.A. 2026
+                                </p>
+                            </div>
+                            <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-sky-600 h-1.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Realisasi Keuangan</span>
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-chart-line text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-xl font-black text-slate-800">Rp 78,4 M</p>
+                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                                    <span class="text-emerald-600 font-bold">62.8%</span> dari total Pagu DPA
+                                </p>
+                            </div>
+                            <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 62.8%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Predikat e-SAKIP</span>
+                                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-award text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-xl font-black text-slate-800">BB (84.25)</p>
+                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                                    <span class="text-amber-600 font-bold">+2.4 Poin</span> Target SAKIP "A"
+                                </p>
+                            </div>
+                            <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-amber-500 h-1.5 rounded-full" style="width: 84%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">LKJIP & Dokumen</span>
+                                <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-file-contract text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-xl font-black text-slate-800">Dokumen Siap</p>
+                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                                    <span class="text-sky-600 font-bold">Renstra & LKJIP</span> Lengkap
+                                </p>
+                            </div>
+                            <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">Trend Realisasi Keuangan vs Fisik 2026</h4>
+                                    <p class="text-xs text-slate-500">Target kumulatif bulanan Dinas Pendidikan & Kebudayaan</p>
+                                </div>
+                                <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md font-medium border border-slate-200">Per Bulan</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="chartRealisasi"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                                    <h4 class="font-bold text-slate-800 text-sm">Proporsi Pagu Menurut Bidang</h4>
+                                    <i class="fa-solid fa-pie-chart text-slate-400"></i>
+                                </div>
+                                <div class="h-52 relative flex items-center justify-center">
+                                    <canvas id="chartProporsi"></canvas>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-4 text-[11px] border-t border-slate-100 pt-3">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
+                                    <span class="text-slate-600 truncate">Sekretariat (40%)</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span class="text-slate-600 truncate">Dikdas SD/SMP (35%)</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                    <span class="text-slate-600 truncate">PAUD & PNF (15%)</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                    <span class="text-slate-600 truncate">Kebudayaan (10%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ================= TAB 2: PERENCANAAN & RKA ================= -->
+                <div id="tab-perencanaan" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Perencanaan Anggaran & RKA Sub-Kegiatan</h3>
+                            <p class="text-xs text-slate-500">Penyusunan Rencana Kerja Dinas Pendidikan dan Kebudayaan Pesisir Barat</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openModal('modal-tambah-rka')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Usulkan RKA Baru
+                            </button>
+                            <button onclick="showToast('Data RKA Synchronized dengan SIPD RI', 'success')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-2 rounded-lg border border-slate-200 transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate"></i> Sync SIPD RI
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse" id="table-rka">
+                                <thead>
+                                    <tr class="bg-slate-800 text-white font-semibold">
+                                        <th class="p-3">Kode Rekening</th>
+                                        <th class="p-3">Nama Program / Sub-Kegiatan</th>
+                                        <th class="p-3">Bidang</th>
+                                        <th class="p-3">Pagu Indikatif (Rp)</th>
+                                        <th class="p-3">Sumber Dana</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200" id="rka-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB: DPA & DPPA ================= -->
+                <div id="tab-dpadppa" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Manajemen DPA & DPPA (Dokumen Pelaksanaan Anggaran)</h3>
+                            <p class="text-xs text-slate-500">Pengelolaan DPA APBD Murni & DPPA Perubahan Disdikbud Pesisir Barat</p>
+                        </div>
+                        <button onclick="openModal('modal-dpa-geser')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-arrows-rotate"></i> Ajukan Pergeseran / DPPA
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Status DPA Murni</p>
+                            <p class="text-lg font-black text-slate-800 mt-1">DPA-SKPD 2026 Active</p>
+                            <p class="text-[11px] text-slate-500 mt-1">No. Reg: 1.01.01/DPA/2026</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Usulan DPPA Perubahan</p>
+                            <p class="text-lg font-black text-indigo-600 mt-1">2 Sub-Kegiatan</p>
+                            <p class="text-[11px] text-slate-500 mt-1">Status: Tahap Verifikasi TAPD</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Total Pergeseran Anggaran</p>
+                            <p class="text-lg font-black text-emerald-600 mt-1">Rp 450.000.000</p>
+                            <p class="text-[11px] text-slate-500 mt-1">Antar Sub-Rincian Belanja Modal</p>
+                        </div>
+                    </div>
+
+                    <!-- DPA Rincian Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                            <h4 class="font-bold text-slate-800 text-sm">Rincian Dokumen Pelaksanaan Anggaran (DPA-SKPD)</h4>
+                            <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-semibold border border-indigo-200">T.A. 2026 APBD Murni</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                        <th class="p-3">Kode DPA</th>
+                                        <th class="p-3">Program / Sub-Kegiatan</th>
+                                        <th class="p-3">Pagu Murni (Rp)</th>
+                                        <th class="p-3">Pagu Perubahan (Rp)</th>
+                                        <th class="p-3">Selisih</th>
+                                        <th class="p-3">Status DPPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="dpa-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 3: KEUANGAN & SP2D ================= -->
+                <div id="tab-keuangan" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Manajemen Keuangan, SPM & SP2D</h3>
+                            <p class="text-xs text-slate-500">Pencatatan realisasi keuangan per jenis belanja (Pegawai, Barang/Jasa, Modal)</p>
+                        </div>
+                        <button onclick="openModal('modal-tambah-sp2d')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar"></i> Registrasi SP2D Baru
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                            <h4 class="font-bold text-slate-800 text-sm">Daftar Pencairan Surat Perintah Pencairan Dana (SP2D)</h4>
+                            <span class="text-xs text-slate-500">Terdaftar SP2D Aktif</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                        <th class="p-3">No. SP2D</th>
+                                        <th class="p-3">Tanggal Terbit</th>
+                                        <th class="p-3">Uraian / Penerima</th>
+                                        <th class="p-3">Jumlah Pencairan (Rp)</th>
+                                        <th class="p-3">Jenis Belanja</th>
+                                        <th class="p-3">Status Bank</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="sp2d-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 4: DANA BOS & BOP PAUD ================= -->
+                <div id="tab-bos" class="tab-content space-y-6 hidden">
+                    <div class="bg-gradient-to-r from-amber-600 to-amber-800 rounded-2xl p-6 text-white shadow-md">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <span class="bg-white/20 text-xs px-2.5 py-0.5 rounded-full font-bold">Monitoring Satuan Pendidikan</span>
+                                <h3 class="text-xl font-black mt-1">Penyaluran Dana BOS SD/SMP & BOP PAUD Pesisir Barat</h3>
+                                <p class="text-amber-100 text-xs mt-1">Total Satuan Pendidikan Terdaftar: 114 SD, 28 SMP, 42 PAUD</p>
+                            </div>
+                            <button onclick="showToast('Verifikasi Otomatis Rekening BOS Aktif', 'info')" class="bg-white text-amber-900 font-bold text-xs px-4 py-2.5 rounded-xl shadow">
+                                <i class="fa-solid fa-check-circle"></i> Cek Rekening LPJ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse" id="table-sekolah">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 font-semibold">
+                                        <th class="p-3">NPSN</th>
+                                        <th class="p-3">Nama Sekolah</th>
+                                        <th class="p-3">Jenjang</th>
+                                        <th class="p-3">Kecamatan</th>
+                                        <th class="p-3">Alokasi Tahap I (Rp)</th>
+                                        <th class="p-3">Status LPJ</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="sekolah-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 5: PROGRAM KEBUDAYAAN ================= -->
+                <div id="tab-kebudayaan" class="tab-content space-y-6 hidden">
+                    <div class="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-2xl p-6 text-white shadow-md flex justify-between items-center">
+                        <div>
+                            <span class="bg-purple-500/30 text-purple-200 border border-purple-400/30 text-xs px-2.5 py-1 rounded-full font-bold">Pelestarian Adat Sai Batin & Cagar Budaya</span>
+                            <h3 class="text-xl font-black mt-2">Dinas Pendidikan & Kebudayaan - Bidang Kebudayaan</h3>
+                            <p class="text-purple-200 text-xs mt-1">Pengelolaan Dana Hibah Sanggar Seni, Pelestarian Cagar Budaya Krui, & Festival Stabas</p>
+                        </div>
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl border border-white/20 flex items-center justify-center text-2xl text-purple-300">
+                            <i class="fa-solid fa-masks-theater"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-monument"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">Cagar Budaya & Situs Sejarah</h4>
+                            <p class="text-xs text-slate-500">Pemeliharaan Rumah Adat Lamban Gedung, Situs Batu Guhi, dan Makam Keramat Pesisir Barat.</p>
+                            <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-700">Pagu: Rp 450 Juta</span>
+                                <span class="text-purple-600 font-semibold">4 Kegiatan</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-drum"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">Hibah Sanggar Seni Tradisional</h4>
+                            <p class="text-xs text-slate-500">Bantuan peralatan Musik Nyambai, Tari Hadra, dan Pakaian Adat Lampung Pesisir.</p>
+                            <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-700">Pagu: Rp 350 Juta</span>
+                                <span class="text-amber-600 font-semibold">18 Sanggar</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                            <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-champagne-glasses"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">Festival Teluk Stabas XII</h4>
+                            <p class="text-xs text-slate-500">Ajang tahunan kebudayaan daerah, lomba cipta lagu Krui, dan pawai budaya Pesisir Barat.</p>
+                            <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-700">Pagu: Rp 600 Juta</span>
+                                <span class="text-sky-600 font-semibold">Persiapan 70%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 6: e-SAKIP & IKU ================= -->
+                <div id="tab-esakip" class="tab-content space-y-6 hidden">
+                    <div class="bg-gradient-to-r from-teal-800 to-emerald-900 rounded-2xl p-6 text-white shadow-md flex justify-between items-center">
+                        <div>
+                            <span class="bg-teal-500/30 text-teal-200 border border-teal-400/30 text-xs px-2.5 py-1 rounded-full font-bold">Aplikasi SAKIP Terintegrasi KemenPAN-RB</span>
+                            <h3 class="text-xl font-black mt-2">e-SAKIP Disdikbud Kabupaten Pesisir Barat</h3>
+                            <p class="text-teal-100 text-xs mt-1">Pengukuran Indikator Kinerja Utama (IKU), Cascading Kinerja & Perjanjian Kinerja Kadis</p>
+                        </div>
+                        <div class="text-right bg-white/10 p-3 rounded-xl border border-white/20">
+                            <p class="text-[10px] text-teal-200 font-bold uppercase">Nilai Evaluasi SAKIP</p>
+                            <p class="text-2xl font-black text-amber-300">84.25 (BB)</p>
+                        </div>
+                    </div>
+
+                    <!-- IKU Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                            <h4 class="font-bold text-slate-800 text-sm">Capaian Indikator Kinerja Utama (IKU) T.A. 2026</h4>
+                            <button onclick="showToast('Data e-SAKIP disinkronkan dengan MenPAN-RB', 'success')" class="text-xs bg-teal-50 text-teal-700 font-bold px-3 py-1 rounded-lg border border-teal-200">
+                                <i class="fa-solid fa-arrows-rotate"></i> Update Capaian IKU
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                        <th class="p-3">No</th>
+                                        <th class="p-3">Sasaran Strategis</th>
+                                        <th class="p-3">Indikator Kinerja Utama (IKU)</th>
+                                        <th class="p-3">Satuan</th>
+                                        <th class="p-3 text-center">Target 2026</th>
+                                        <th class="p-3 text-center">Realisasi Q3</th>
+                                        <th class="p-3 text-center">% Capaian</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="esakip-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 7: GENERATOR DOKUMEN (RENSTRA, RENJA, LKJIP) ================= -->
+                <div id="tab-docbuilder" class="tab-content space-y-6 hidden">
+                    
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-rose-500"></i> Generator Dokumen Resmi Perencanaan & LKJIP
+                            </h3>
+                            <p class="text-xs text-slate-500">Buat dokumen RENSTRA, RENJA, dan LKJIP secara otomatis dengan format standar Pemkab Pesisir Barat</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="printFormattedDoc()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-file-pdf"></i> Cetak / Export PDF
+                            </button>
+                            <button onclick="copyDocText()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-copy"></i> Salin Teks Dokumen
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Builder Grid Layout -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        
+                        <!-- Form Editor Controls (Left) -->
+                        <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4 no-print">
+                            <div class="border-b border-slate-100 pb-3">
+                                <h4 class="font-bold text-slate-800 text-sm">Form Control Generator</h4>
+                                <p class="text-[11px] text-slate-500">Pilih jenis dokumen dan sesuaikan variabel isi</p>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs text-slate-700 mb-1">Jenis Dokumen yang Dibuat</label>
+                                <select id="doc-type-select" onchange="updateDocBuilderPreview()" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 font-semibold text-slate-800">
+                                    <option value="RENSTRA" selected>Rencana Strategis (RENSTRA) 2026-2030</option>
+                                    <option value="RENJA">Rencana Kerja (RENJA) T.A. 2026</option>
+                                    <option value="LKJIP">Laporan Kinerja Instansi Pemerintah (LKJIP) 2026</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs text-slate-700 mb-1">Nomor Surat / Keputusan</label>
+                                <input type="text" id="doc-input-no" value="050/ 124 /DISDIKBUD.PB/2026" oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs text-slate-700 mb-1">Visi Strategis Daerah</label>
+                                <textarea id="doc-input-visi" rows="2" oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">Terwujudnya Kabupaten Pesisir Barat yang Sejahtera, Maju, dan Religius Berbasis Pendidikan Kualitas Tinggi & Pelestarian Adat Sai Batin.</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs text-slate-700 mb-1">Fokus Program Strategis Tahun Ini</label>
+                                <textarea id="doc-input-fokus" rows="3" oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">1. Peningkatan Akses Pendidikan Dasar SD/SMP Gratis & Berkualitas.
+2. Digitalisasi Sekolah dan Pengadaan Sarana TIK.
+3. Pelestarian Cagar Budaya & Penyelenggaraan Festival Teluk Stabas.
+4. Penyaluran Tepat Waktu Operasional Dana BOS & BOP PAUD.</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-xs text-slate-700 mb-1">Tanggal Penetapan</label>
+                                    <input type="text" id="doc-input-tgl" value="07 Oktober 2026" oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-xs text-slate-700 mb-1">Lokasi Penetapan</label>
+                                    <input type="text" id="doc-input-kota" value="Krui, Pesisir Barat" oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs text-slate-700 mb-1">Nama Kepala Dinas</label>
+                                <input type="text" id="doc-input-kadis" value="MARNENTINUS, S.IP." oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg font-bold">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs text-slate-700 mb-1">NIP Kepala Dinas</label>
+                                <input type="text" id="doc-input-nip" value="NIP. 19690315 199403 1 004" oninput="updateDocBuilderPreview()" class="w-full text-xs p-2 border border-slate-300 rounded-lg font-mono">
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex gap-2">
+                                <button onclick="resetDocForm()" class="w-full py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-200">
+                                    Reset Form
+                                </button>
+                                <button onclick="showToast('Draft Dokumen Disimpan ke Memori Lokalnya', 'success')" class="w-full py-2 bg-rose-600 text-white rounded-lg text-xs font-bold hover:bg-rose-700 shadow">
+                                    Simpan Draft
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- LIVE PREVIEW SHEET (Right) -->
+                        <div class="lg:col-span-7 bg-white rounded-2xl p-8 border border-slate-200 shadow-md doc-preview-font doc-print-area">
+                            
+                            <!-- Kop Surat Pemkab Pesisir Barat -->
+                            <div class="border-b-4 border-double border-slate-900 pb-4 mb-6 text-center">
+                                <div class="flex items-center justify-center gap-4">
+                                    <div class="w-14 h-14 rounded-full bg-slate-900 text-amber-400 flex items-center justify-center font-black text-2xl flex-shrink-0">
+                                        <i class="fa-solid fa-landmark"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-bold tracking-wider uppercase text-slate-900">PEMERINTAH KABUPATEN PESISIR BARAT</h3>
+                                        <h2 class="text-base font-extrabold uppercase text-slate-900 tracking-wide mt-0.5">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
+                                        <p class="text-[10px] text-slate-600 font-sans mt-0.5">Komplek Perkantoran Pemkab Pesisir Barat, Jln. Merdeka No. 1 Krui, Kode Pos 34874</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Document Body Live Output -->
+                            <div id="doc-live-preview-content" class="text-xs text-slate-800 leading-relaxed space-y-4">
+                                <!-- Dynamic Output Generated by JS -->
+                            </div>
+
+                            <!-- Signature Block -->
+                            <div class="mt-12 pt-6 flex justify-between items-end text-xs font-sans">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 font-mono">SIPERKA Disdikbud PB Validated</p>
+                                    <div class="w-20 h-20 border border-slate-200 rounded-lg bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 mt-1">
+                                        [QR Digital]
+                                    </div>
+                                </div>
+                                <div class="text-center w-64">
+                                    <p id="preview-out-kota-tgl">Krui, 07 Oktober 2026</p>
+                                    <p class="font-bold text-slate-900 mt-1">Kepala Dinas Pendidikan dan Kebudayaan<br>Kabupaten Pesisir Barat</p>
+                                    <br><br><br>
+                                    <p id="preview-out-kadis" class="font-bold underline text-slate-900 text-sm">MARNENTINUS, S.IP.</p>
+                                    <p id="preview-out-nip" class="text-[11px] text-slate-600 font-mono">NIP. 19690315 199403 1 004</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ================= TAB 8: VERIFIKASI & APPROVAL ================= -->
+                <div id="tab-verifikasi" class="tab-content space-y-6 hidden">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Persetujuan & Verifikasi Dokumen RKA / SPM</h3>
+                            <p class="text-xs text-slate-500">Hirarki Approval: Operator → Kasubag Keuangan → Sekretaris → Kepala Dinas</p>
+                        </div>
+                        <span class="bg-rose-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
+                            3 Menunggu Persetujuan
+                        </span>
+                    </div>
+
+                    <div class="space-y-4" id="approval-queue-container">
+                    </div>
+                </div>
+
+                <!-- ================= TAB 9: LAPORAN REALISASI ================= -->
+                <div id="tab-laporan" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm no-print">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Laporan Realisasi Anggaran (LRA) & Pengawasan</h3>
+                            <p class="text-xs text-slate-500">Format Rekapitulasi Standard LKPJ / LAKIP Pesisir Barat</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm flex items-center gap-2">
+                                <i class="fa-solid fa-print"></i> Cetak Laporan PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4 print-shadow-none">
+                        <h4 class="font-bold text-slate-800 text-sm mb-3">Rekapitulasi Belanja Dinas Pendidikan dan Kebudayaan T.A. 2026</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse border border-slate-200">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300">
+                                        <th class="p-2.5 border border-slate-200">Kode Belanja</th>
+                                        <th class="p-2.5 border border-slate-200">Uraian Belanja</th>
+                                        <th class="p-2.5 border border-slate-200 text-right">Pagu Anggaran (Rp)</th>
+                                        <th class="p-2.5 border border-slate-200 text-right">Realisasi (Rp)</th>
+                                        <th class="p-2.5 border border-slate-200 text-right">Sisa Anggaran (Rp)</th>
+                                        <th class="p-2.5 border border-slate-200 text-center">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    <tr class="font-bold bg-slate-50">
+                                        <td class="p-2.5 border border-slate-200">5.1</td>
+                                        <td class="p-2.5 border border-slate-200">BELANJA OPERASI</td>
+                                        <td class="p-2.5 border border-slate-200 text-right">98.800.000.000</td>
+                                        <td class="p-2.5 border border-slate-200 text-right">69.800.000.000</td>
+                                        <td class="p-2.5 border border-slate-200 text-right">29.000.000.000</td>
+                                        <td class="p-2.5 border border-slate-200 text-center">70,6%</td>
+                                    </tr>
+                                    <tr class="font-bold bg-slate-50">
+                                        <td class="p-2.5 border border-slate-200">5.2</td>
+                                        <td class="p-2.5 border border-slate-200">BELANJA MODAL</td>
+                                        <td class="p-2.5 border border-slate-200 text-right">26.000.000.000</td>
+                                        <td class="p-2.5 border border-slate-200 text-right">8.600.000.000</td>
+                                        <td class="p-2.5 border border-slate-200 text-right">17.400.000.000</td>
+                                        <td class="p-2.5 border border-slate-200 text-center">33,1%</td>
+                                    </tr>
+                                    <tr class="font-black bg-slate-200 text-slate-900 text-sm">
+                                        <td colspan="2" class="p-3 border border-slate-300 text-right">TOTAL BELANJA DISDIKBUD:</td>
+                                        <td class="p-3 border border-slate-300 text-right">124.800.000.000</td>
+                                        <td class="p-3 border border-slate-300 text-right">78.400.000.000</td>
+                                        <td class="p-3 border border-slate-300 text-right">46.400.000.000</td>
+                                        <td class="p-3 border border-slate-300 text-center">62,8%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- MODAL 1: TAMBAH RKA -->
+    <div id="modal-tambah-rka" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-file-circle-plus text-sky-400"></i> Form Pengajuan RKA Sub-Kegiatan
+                </h3>
+                <button onclick="closeModal('modal-tambah-rka')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="form-rka" onsubmit="handleFormRkaSubmit(event)" class="p-5 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Kode Rekening Sub-Kegiatan</label>
+                    <input type="text" required placeholder="Contoh: 1.01.02.2.01.0004" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Sub-Kegiatan / Program</label>
+                    <input type="text" id="input-rka-nama" required placeholder="Contoh: Pengadaan Meubelair Sekolah Dasar" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Bidang Pengampu</label>
+                        <select id="input-rka-bidang" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                            <option value="Sekretariat">Sekretariat</option>
+                            <option value="Dikdas">Bidang Pendidikan Dasar</option>
+                            <option value="PAUD">Bidang PAUD & PNF</option>
+                            <option value="Kebudayaan">Bidang Kebudayaan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Sumber Dana</label>
+                        <select id="input-rka-sumber" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                            <option value="APBD Murni">APBD Murni</option>
+                            <option value="DAK Fisik">DAK Fisik</option>
+                            <option value="BOS">Dana BOS / BOP</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Jumlah Pagu Indikatif (Rp)</label>
+                    <input type="number" id="input-rka-pagu" required placeholder="250000000" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('modal-tambah-rka')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 shadow">Simpan & Ajukan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: REGISTRASI SP2D -->
+    <div id="modal-tambah-sp2d" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-emerald-900 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Registrasi Penerbitan SP2D Baru
+                </h3>
+                <button onclick="closeModal('modal-tambah-sp2d')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="form-sp2d" onsubmit="handleFormSp2dSubmit(event)" class="p-5 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nomor SP2D</label>
+                    <input type="text" id="input-sp2d-no" required placeholder="00421/SP2D/DISDIK/2026" class="w-full p-2 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Uraian Keperluan / Penerima</label>
+                    <input type="text" id="input-sp2d-uraian" required placeholder="Pembayaran Termyn I Rehab SDN 1 Krui" class="w-full p-2 border border-slate-300 rounded-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nominal SP2D (Rp)</label>
+                        <input type="number" id="input-sp2d-nominal" required placeholder="350000000" class="w-full p-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Jenis Belanja</label>
+                        <select id="input-sp2d-jenis" required class="w-full p-2 border border-slate-300 rounded-lg">
+                            <option value="Belanja Pegawai">Belanja Pegawai</option>
+                            <option value="Belanja Barang & Jasa">Belanja Barang & Jasa</option>
+                            <option value="Belanja Modal">Belanja Modal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('modal-tambah-sp2d')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 shadow">Simpan SP2D</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        let state = {
+            activeTab: 'dashboard',
+            selectedTA: '2026',
+            rkaList: [
+                { id: 1, kode: '1.01.02.2.01.0001', nama: 'Pengadaan Lab Komputer SMPN 1 Lemong', bidang: 'Dikdas', pagu: 450000000, sumber: 'APBD Murni', status: 'Disetujui' },
+                { id: 2, kode: '1.01.02.2.01.0002', nama: 'Rehab Gedung Ruang Kelas SDN 1 Krui', bidang: 'Dikdas', pagu: 780000000, sumber: 'DAK Fisik', status: 'Disetujui' },
+                { id: 3, kode: '1.01.03.2.02.0005', nama: 'Festival Teluk Stabas XII & Pawai Budaya', bidang: 'Kebudayaan', pagu: 600000000, sumber: 'APBD Murni', status: 'Review' },
+                { id: 4, kode: '1.01.01.2.01.0003', nama: 'Honorarium Tenaga Kerja Sukarela (TKS)', bidang: 'Sekretariat', pagu: 1200000000, sumber: 'APBD Murni', status: 'Disetujui' }
+            ],
+            dpaList: [
+                { id: 101, kode: '1.01.01.2.01', nama: 'Program Pelayanan Administrasi Perkantoran', paguMurni: 12500000000, paguPerubahan: 12500000000, status: 'Tetap' },
+                { id: 102, kode: '1.01.02.2.01', nama: 'Program Pengelolaan Pendidikan Dasar SD/SMP', paguMurni: 42000000000, paguPerubahan: 42450000000, status: 'Bertambah (+450 Juta)' },
+                { id: 103, kode: '1.01.03.2.01', nama: 'Program Pengembangan Kebudayaan & Tradisi', paguMurni: 6200000000, paguPerubahan: 6200000000, status: 'Tetap' }
+            ],
+            sp2dList: [
+                { id: 1, no: '00311/SP2D/DISDIK/2026', tanggal: '02/10/2026', uraian: 'Gaji Pokok & Tunjangan ASN Disdikbud Oktober', nominal: 4120000000, jenis: 'Belanja Pegawai', status: 'Cair (Bank Lampung)' },
+                { id: 2, no: '00312/SP2D/DISDIK/2026', tanggal: '04/10/2026', uraian: 'Termyn I Lab Komputer SMPN 1 Lemong', nominal: 225000000, jenis: 'Belanja Modal', status: 'Cair (Bank Lampung)' }
+            ],
+            sekolahList: [
+                { npsn: '10803121', nama: 'SD Negeri 1 Krui', jenjang: 'SD', kec: 'Pesisir Tengah', alokasi: 124000000, status: 'Lengkap' },
+                { npsn: '10803155', nama: 'SD Negeri 3 Lemong', jenjang: 'SD', kec: 'Lemong', alokasi: 86000000, status: 'Verifikasi' },
+                { npsn: '10803201', nama: 'SMP Negeri 1 Pesisir Selatan', jenjang: 'SMP', kec: 'Pesisir Selatan', alokasi: 210000000, status: 'Lengkap' }
+            ],
+            esakipList: [
+                { no: 1, sasaran: 'Meningkatnya Aksesibilitas & Kualitas Pendidikan Dasar', iku: 'Angka Partisipasi Murni (APM) SD/SMP', satuan: '%', target: '98.5', realisasi: '97.8', capaian: '99.2%' },
+                { no: 2, sasaran: 'Meningkatnya Mutu Sarana Prasarana Sekolah', iku: 'Persentase Sekolah Sesuai SPM Minimal', satuan: '%', target: '88.0', realisasi: '85.4', capaian: '97.0%' },
+                { no: 3, sasaran: 'Pelestarian Seni & Adat Istiadat Sai Batin', iku: 'Indeks Pembangunan Kebudayaan Daerah', satuan: 'Indeks', target: '72.0', realisasi: '74.5', capaian: '103.4%' }
+            ],
+            approvalQueue: [
+                { id: 101, judul: 'RKA Pengadaan Meubelair SD Pesisir Utara', pengaju: 'Bidang Dikdas', pagu: 180000000, tgl: '06 Okt 2026' },
+                { id: 102, judul: 'Pencairan SPM Hibah Sanggar Seni Krui', pengaju: 'Bidang Kebudayaan', pagu: 75000000, tgl: '06 Okt 2026' }
+            ]
+        };
+
+        window.onload = function() {
+            initCharts();
+            renderRkaTable();
+            renderDpaTable();
+            renderSp2dTable();
+            renderSekolahTable();
+            renderEsakipTable();
+            renderApprovalQueue();
+            updateDocBuilderPreview();
+        };
+
+        function initCharts() {
+            const ctx1 = document.getElementById('chartRealisasi').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+                    datasets: [
+                        {
+                            label: 'Realisasi Keuangan (Miliar Rp)',
+                            data: [5.2, 11.4, 18.2, 26.5, 35.1, 48.0, 56.2, 65.4, 72.1, 78.4],
+                            backgroundColor: '#0284c7',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Target Fisik (%)',
+                            data: [6, 12, 20, 30, 42, 55, 65, 75, 82, 88],
+                            type: 'line',
+                            borderColor: '#059669',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+                    scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            const ctx2 = document.getElementById('chartProporsi').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sekretariat', 'Dikdas (SD/SMP)', 'PAUD & PNF', 'Kebudayaan'],
+                    datasets: [{
+                        data: [40, 35, 15, 10],
+                        backgroundColor: ['#0284c7', '#059669', '#f59e0b', '#a855f7'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function switchTab(tabId) {
+            state.activeTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            const target = document.getElementById('tab-' + tabId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-sky-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-400');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-sky-600', 'text-white', 'shadow-md');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            const titles = {
+                'dashboard': 'Dashboard Eksekutif Perencanaan & Keuangan',
+                'perencanaan': 'Modul Perencanaan & Penyusunan RKA',
+                'dpadppa': 'Manajemen DPA & DPPA Perubahan Anggaran',
+                'keuangan': 'Modul Pengelolaan Keuangan & SP2D',
+                'bos': 'Monitoring Dana BOS & BOP PAUD',
+                'kebudayaan': 'Pengelolaan Program Kebudayaan & Hibah',
+                'esakip': 'Sistem Akuntabilitas Kinerja Instansi Pemerintah (e-SAKIP)',
+                'docbuilder': 'Pembuat Dokumen Resmi: RENSTRA, RENJA & LKJIP',
+                'verifikasi': 'Verifikasi & Hirarki Persetujuan Dokumen',
+                'laporan': 'Laporan Realisasi Anggaran (LRA)'
+            };
+            document.getElementById('page-title').innerText = titles[tabId] || 'SIPERKA Pesisir Barat';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-ml-64');
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notif-dropdown').classList.toggle('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColors = {
+                'success': 'bg-slate-900 border-emerald-500 text-white',
+                'info': 'bg-slate-900 border-sky-500 text-white',
+                'warning': 'bg-slate-900 border-amber-500 text-white'
+            };
+
+            const icons = {
+                'success': '<i class="fa-solid fa-circle-check text-emerald-400"></i>',
+                'info': '<i class="fa-solid fa-circle-info text-sky-400"></i>',
+                'warning': '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>'
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 shadow-xl text-xs transition-all transform translate-y-2 opacity-0 ${bgColors[type] || bgColors.info}`;
+            toast.innerHTML = `${icons[type] || icons.info} <span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function renderRkaTable() {
+            const tbody = document.getElementById('rka-table-body');
+            tbody.innerHTML = '';
+            state.rkaList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-700">${item.kode}</td>
+                    <td class="p-3 font-semibold text-slate-800">${item.nama}</td>
+                    <td class="p-3">${item.bidang}</td>
+                    <td class="p-3 font-bold text-slate-900">Rp ${item.pagu.toLocaleString('id-ID')}</td>
+                    <td class="p-3"><span class="bg-sky-50 text-sky-700 border border-sky-200 px-2 py-0.5 rounded text-[10px]">${item.sumber}</span></td>
+                    <td class="p-3"><span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]">${item.status}</span></td>
+                    <td class="p-3 text-center">
+                        <button onclick="showToast('Detail RKA dipilih', 'info')" class="text-sky-600 hover:text-sky-800"><i class="fa-solid fa-eye"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDpaTable() {
+            const tbody = document.getElementById('dpa-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            state.dpaList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-indigo-700">${item.kode}</td>
+                    <td class="p-3 font-semibold text-slate-800">${item.nama}</td>
+                    <td class="p-3 font-medium">Rp ${item.paguMurni.toLocaleString('id-ID')}</td>
+                    <td class="p-3 font-bold text-slate-900">Rp ${item.paguPerubahan.toLocaleString('id-ID')}</td>
+                    <td class="p-3 font-bold text-emerald-600">Rp ${(item.paguPerubahan - item.paguMurni).toLocaleString('id-ID')}</td>
+                    <td class="p-3"><span class="bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-2 py-0.5 rounded text-[10px]">${item.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSp2dTable() {
+            const tbody = document.getElementById('sp2d-table-body');
+            tbody.innerHTML = '';
+            state.sp2dList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-sky-700">${item.no}</td>
+                    <td class="p-3 text-slate-500">${item.tanggal}</td>
+                    <td class="p-3 font-medium text-slate-800">${item.uraian}</td>
+                    <td class="p-3 font-bold text-emerald-700">Rp ${item.nominal.toLocaleString('id-ID')}</td>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px]">${item.jenis}</span></td>
+                    <td class="p-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]"><i class="fa-solid fa-check"></i> ${item.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSekolahTable() {
+            const tbody = document.getElementById('sekolah-table-body');
+            tbody.innerHTML = '';
+            state.sekolahList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-slate-600">${item.npsn}</td>
+                    <td class="p-3 font-bold text-slate-800">${item.nama}</td>
+                    <td class="p-3"><span class="bg-slate-200 text-slate-800 font-bold px-1.5 py-0.5 rounded text-[10px]">${item.jenjang}</span></td>
+                    <td class="p-3 text-slate-600">${item.kec}</td>
+                    <td class="p-3 font-bold text-slate-800">Rp ${item.alokasi.toLocaleString('id-ID')}</td>
+                    <td class="p-3"><span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]">${item.status}</span></td>
+                    <td class="p-3 text-center">
+                        <button onclick="showToast('LPJ ${item.nama} diverifikasi', 'info')" class="text-sky-600 font-semibold text-[11px]">Lihat LPJ</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderEsakipTable() {
+            const tbody = document.getElementById('esakip-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            state.esakipList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-slate-500">${item.no}</td>
+                    <td class="p-3 font-semibold text-slate-800">${item.sasaran}</td>
+                    <td class="p-3 font-medium text-slate-700">${item.iku}</td>
+                    <td class="p-3 text-slate-500">${item.satuan}</td>
+                    <td class="p-3 text-center font-bold">${item.target}</td>
+                    <td class="p-3 text-center font-bold text-sky-700">${item.realisasi}</td>
+                    <td class="p-3 text-center"><span class="bg-teal-100 text-teal-800 font-black px-2 py-0.5 rounded text-[10px]">${item.capaian}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderApprovalQueue() {
+            const container = document.getElementById('approval-queue-container');
+            container.innerHTML = '';
+            state.approvalQueue.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4';
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Menunggu Kadis</span>
+                            <span class="text-slate-400 text-[10px]">${item.tgl}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm">${item.judul}</h4>
+                        <p class="text-xs text-slate-500">Pengaju: <span class="font-semibold text-slate-700">${item.pengaju}</span> • Pagu: <span class="font-bold text-slate-800">Rp ${item.pagu.toLocaleString('id-ID')}</span></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="approveItem(${item.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow transition-all">
+                            <i class="fa-solid fa-check"></i> Setujui
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function approveItem(id) {
+            state.approvalQueue = state.approvalQueue.filter(i => i.id !== id);
+            renderApprovalQueue();
+            showToast('Dokumen telah Disetujui oleh Kadis MARNENTINUS, S.IP.', 'success');
+        }
+
+        function updateDocBuilderPreview() {
+            const docType = document.getElementById('doc-type-select').value;
+            const noSurat = document.getElementById('doc-input-no').value;
+            const visi = document.getElementById('doc-input-visi').value;
+            const fokus = document.getElementById('doc-input-fokus').value;
+            const tgl = document.getElementById('doc-input-tgl').value;
+            const kota = document.getElementById('doc-input-kota').value;
+            const kadis = document.getElementById('doc-input-kadis').value;
+            const nip = document.getElementById('doc-input-nip').value;
+
+            document.getElementById('preview-out-kota-tgl').innerText = `${kota}, ${tgl}`;
+            document.getElementById('preview-out-kadis').innerText = kadis;
+            document.getElementById('preview-out-nip').innerText = nip;
+
+            const previewContainer = document.getElementById('doc-live-preview-content');
+
+            if (docType === 'RENSTRA') {
+                previewContainer.innerHTML = `
+                    <div class="text-center font-bold mb-4">
+                        <h4 class="text-sm uppercase font-bold text-slate-900">RENCANA STRATEGIS (RENSTRA) 2026-2030</h4>
+                        <p class="text-[11px] font-mono text-slate-600">Nomor Registrasi: ${noSurat}</p>
+                    </div>
+                    <p><strong>BAB I. PENDAHULUAN</strong><br>
+                    Rencana Strategis (RENSTRA) Dinas Pendidikan dan Kebudayaan Kabupaten Pesisir Barat Tahun 2026-2030 disusun sebagai pedoman penyelenggaraan urusan pemerintahan di bidang pendidikan dan kebudayaan.</p>
+                    
+                    <p><strong>BAB II. VISI DAN MISI STRATEGIS</strong><br>
+                    <strong>Visi:</strong> "${visi}"</p>
+
+                    <p><strong>BAB III. FOKUS PROGRAM & PRIORITAS PEMBANGUNAN</strong></p>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 text-[11px] whitespace-pre-line font-sans">
+${fokus}
+                    </div>
+
+                    <p><strong>BAB IV. PENUTUP & PENGESAHAN</strong><br>
+                    Demikian Rencana Strategis ini ditetapkan untuk menjadi acuan kerja seluruh Bidang, Satuan Pendidikan, dan Stakeholder di Pesisir Barat.</p>
+                `;
+            } else if (docType === 'RENJA') {
+                previewContainer.innerHTML = `
+                    <div class="text-center font-bold mb-4">
+                        <h4 class="text-sm uppercase font-bold text-slate-900">RENCANA KERJA (RENJA) TAHUN ANGGARAN 2026</h4>
+                        <p class="text-[11px] font-mono text-slate-600">Nomor Keputusan: ${noSurat}</p>
+                    </div>
+                    <p><strong>1. LANDASAN OPERASIONAL</strong><br>
+                    Renja T.A. 2026 mengacu pada sasaran RKPD Kabupaten Pesisir Barat dengan prioritas pemenuhan Standar Pelayanan Minimal (SPM) Pendidikan.</p>
+
+                    <p><strong>2. RINCIAN FOKUS SUB-KEGIATAN PRIOIRITAS</strong></p>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 text-[11px] whitespace-pre-line font-sans">
+${fokus}
+                    </div>
+
+                    <p><strong>3. TARGET ANGGARAN & CAPAIAN FISIK</strong><br>
+                    Total Pagu Alokasi Anggaran Belanja Disdikbud T.A. 2026 ditetapkan sebesar <strong>Rp 124.800.000.000,-</strong> (Seratus Dua Puluh Empat Miliar Delapan Ratus Juta Rupiah).</p>
+                `;
+            } else if (docType === 'LKJIP') {
+                previewContainer.innerHTML = `
+                    <div class="text-center font-bold mb-4">
+                        <h4 class="text-sm uppercase font-bold text-slate-900">LAPORAN KINERJA INSTANSI PEMERINTAH (LKJIP) T.A. 2026</h4>
+                        <p class="text-[11px] font-mono text-slate-600">Dokumen Akuntabilitas e-SAKIP No: ${noSurat}</p>
+                    </div>
+                    <p><strong>RINGKASAN EKSEKUTIF CAPAIAN KINERJA</strong><br>
+                    Laporan Kinerja Instansi Pemerintah (LKJIP) ini menyajikan pertanggungjawaban efisiensi anggaran dan efektivitas pencapaian Indikator Kinerja Utama (IKU) Disdikbud Pesisir Barat.</p>
+
+                    <p><strong>EVALUASI PENCAPAIAN IKU & PROGRAM STRATEGIS:</strong></p>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 text-[11px] whitespace-pre-line font-sans">
+${fokus}
+                    </div>
+
+                    <p><strong>KESIMPULAN PREDIKAT SAKIP:</strong><br>
+                    Pencapaian Kinerja Dinas Pendidikan dan Kebudayaan Kabupaten Pesisir Barat memperoleh Predikat <strong>"BB" (Very Good - 84.25)</strong> dengan realisasi anggaran mencapai 62.8% pada Q3.</p>
+                `;
+            }
+        }
+
+        function printFormattedDoc() {
+            window.print();
+        }
+
+        function copyDocText() {
+            const content = document.getElementById('doc-live-preview-content').innerText;
+            const kadis = document.getElementById('doc-input-kadis').value;
+            const nip = document.getElementById('doc-input-nip').value;
+            const fullText = content + `\n\nKepala Dinas Pendidikan dan Kebudayaan\n${kadis}\n${nip}`;
+            
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = fullText;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            showToast('Teks Dokumen Berhasil Disalin ke Clipboard!', 'success');
+        }
+
+        function resetDocForm() {
+            document.getElementById('doc-input-no').value = "050/ 124 /DISDIKBUD.PB/2026";
+            document.getElementById('doc-input-kadis').value = "MARNENTINUS, S.IP.";
+            document.getElementById('doc-input-nip').value = "NIP. 19690315 199403 1 004";
+            updateDocBuilderPreview();
+            showToast('Form Generator telah di-reset', 'info');
+        }
+
+        function handleFormRkaSubmit(e) {
+            e.preventDefault();
+            const nama = document.getElementById('input-rka-nama').value;
+            const bidang = document.getElementById('input-rka-bidang').value;
+            const sumber = document.getElementById('input-rka-sumber').value;
+            const pagu = parseFloat(document.getElementById('input-rka-pagu').value);
+
+            state.rkaList.unshift({
+                id: Date.now(),
+                kode: `1.01.0${Math.floor(Math.random()*8)+1}.2.01.000${Math.floor(Math.random()*80)+10}`,
+                nama, bidang, pagu, sumber, status: 'Disetujui'
+            });
+
+            renderRkaTable();
+            closeModal('modal-tambah-rka');
+            showToast('RKA Baru Berhasil Diusulkan & Diterima!', 'success');
+        }
+
+        function handleFormSp2dSubmit(e) {
+            e.preventDefault();
+            const no = document.getElementById('input-sp2d-no').value;
+            const uraian = document.getElementById('input-sp2d-uraian').value;
+            const nominal = parseFloat(document.getElementById('input-sp2d-nominal').value);
+            const jenis = document.getElementById('input-sp2d-jenis').value;
+
+            state.sp2dList.unshift({
+                id: Date.now(),
+                no, tanggal: '07/10/2026', uraian, nominal, jenis, status: 'Cair (Bank Lampung)'
+            });
+
+            renderSp2dTable();
+            closeModal('modal-tambah-sp2d');
+            showToast('SP2D Baru Berhasil Diterbitkan!', 'success');
+        }
+
+        function changeTA(ta) {
+            state.selectedTA = ta;
+            showToast(`Sistem Dialihkan ke Tahun Anggaran ${ta}`, 'info');
+        }
+    </script>
+</body>
+</html>
